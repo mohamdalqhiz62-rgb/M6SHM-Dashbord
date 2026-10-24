@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="html-root">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M6SHM Bot - Pro Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        discord: { bg: '#0f1117', card: '#161922', hover: '#1e222e', sidebar: '#12141c', accent: '#5865f2', gold: '#f1c40f', red: '#e74c3c' }
+                    },
+                    fontFamily: { cairo: ['Cairo', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style> body { font-family: 'Cairo', sans-serif; background-color: #0f1117; color: #f6f6f7; } </style>
+</head>
+<body class="bg-discord-bg text-gray-100 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-discord-sidebar border-b border-gray-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="switchView('servers')">
+                <img src="https://cdn.discordapp.com/embed/avatars/0.png" class="w-12 h-12 rounded-2xl border-2 border-discord-accent p-0.5">
+                <div>
+                    <span class="font-black text-xl text-white">M6SHM <span class="text-discord-accent">Bot</span></span>
+                    <p class="text-[11px] text-gray-400" id="txt-subtitle">لوحة التحكم الاحترافية</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <div id="user-rank-badge" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-red-500/20 border border-red-500 text-red-400 flex items-center gap-2">
+                    <i class="fa-solid fa-crown"></i> <span id="rank-name">Owner</span>
+                </div>
+                <button onclick="toggleLanguage()" class="bg-discord-card border border-gray-800 px-3 py-2 rounded-xl text-xs font-bold text-discord-accent">
+                    <i class="fa-solid fa-globe"></i> <span id="lang-text">English</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8 space-y-6">
+        
+        <!-- View 1: Servers -->
+        <section id="view-servers" class="space-y-6">
+            <h1 class="text-2xl font-black text-white" id="txt-select-srv">اختر السيرفر لإدارة إعداداته:</h1>
+            <div id="servers-grid" class="grid grid-cols-1 md:grid-cols-3 gap-5"></div>
+        </section>
+
+        <!-- View 2: Dashboard Settings -->
+        <section id="view-dashboard" class="hidden space-y-6">
+            <div class="bg-discord-card border border-gray-800 rounded-3xl p-6 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <button onclick="switchView('servers')" class="bg-gray-800 text-white w-10 h-10 rounded-xl flex items-center justify-center"><i class="fa-solid fa-arrow-right"></i></button>
+                    <img id="current-server-icon" class="w-12 h-12 rounded-xl border border-gray-700">
+                    <h2 id="current-server-name" class="text-xl font-bold text-white">Server Name</h2>
+                </div>
+                <button onclick="saveSettings()" class="bg-discord-accent text-white px-6 py-2.5 rounded-xl text-xs font-bold shadow-lg" id="txt-save">حفظ التغييرات</button>
+            </div>
+
+            <!-- Free Features -->
+            <div class="bg-discord-card border border-gray-800 rounded-3xl p-6 space-y-4">
+                <h3 class="font-bold text-lg text-white"><i class="fa-solid fa-shield-halved text-discord-accent"></i> الأقسام الأساسية</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-discord-sidebar p-4 rounded-2xl border border-gray-800 flex items-center justify-between">
+                        <span>نظام التذاكر (Tickets)</span>
+                        <input type="checkbox" id="setting-tickets" checked class="w-5 h-5 accent-discord-accent">
+                    </div>
+                    <div class="bg-discord-sidebar p-4 rounded-2xl border border-gray-800 flex items-center justify-between">
+                        <span>أوامر الإشراف (Ban / Kick / Clear)</span>
+                        <input type="checkbox" id="setting-moderation" checked class="w-5 h-5 accent-discord-accent">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Premium Features -->
+            <div id="premium-section" class="bg-gradient-to-br from-yellow-500/10 to-discord-card border border-yellow-500/30 rounded-3xl p-6 space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-bold text-lg text-yellow-400 flex items-center gap-2">
+                        <i class="fa-solid fa-star"></i> ميزات البريميوم (Premium Only)
+                    </h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-discord-sidebar p-4 rounded-2xl border border-gray-800 flex items-center justify-between">
+                        <span>تفعيل روبلوكس الكامل (Roblox Verify)</span>
+                        <input type="checkbox" id="setting-roblox" checked class="w-5 h-5 accent-yellow-400">
+                    </div>
+                    <div class="bg-discord-sidebar p-4 rounded-2xl border border-gray-800 flex items-center justify-between">
+                        <span>نظام التقديمات والأسئلة (Applications)</span>
+                        <input type="checkbox" id="setting-apply" checked class="w-5 h-5 accent-yellow-400">
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        let currentLang = 'ar';
+        let currentGuildId = null;
+        let currentUserRole = 'Owner'; 
+
+        let servers = [
+            { id: '111', name: 'Z7F Forum | منتدى زحف', icon: 'https://cdn.discordapp.com/embed/avatars/1.png' },
+            { id: '222', name: 'منتدى الفروسية', icon: 'https://cdn.discordapp.com/embed/avatars/2.png' }
+        ];
+
+        window.onload = renderServers;
+
+        function renderServers() {
+            let grid = document.getElementById('servers-grid');
+            grid.innerHTML = '';
+            servers.forEach(s => {
+                grid.innerHTML += `
+                    <div class="bg-discord-card border border-gray-800 rounded-3xl p-6 flex flex-col justify-between space-y-4">
+                        <div class="flex items-center gap-4">
+                            <img src="${s.icon}" class="w-12 h-12 rounded-xl border border-gray-700">
+                            <h3 class="font-bold text-white">${s.name}</h3>
+                        </div>
+                        <button onclick="openServer('${s.id}', '${s.name}', '${s.icon}')" class="w-full bg-discord-accent/10 hover:bg-discord-accent text-discord-accent hover:text-white py-3 rounded-2xl text-xs font-bold transition">إدارة السيرفر</button>
+                    </div>
+                `;
+            });
+        }
+
+        function openServer(id, name, icon) {
+            currentGuildId = id;
+            document.getElementById('current-server-name').innerText = name;
+            document.getElementById('current-server-icon').src = icon;
+            switchView('dashboard');
+        }
+
+        function switchView(view) {
+            document.getElementById('view-servers').classList.toggle('hidden', view !== 'servers');
+            document.getElementById('view-dashboard').classList.toggle('hidden', view !== 'dashboard');
+        }
+
+        // دالة حفظ التغييرات وإرسالها مباشرة إلى server.py
+        async function saveSettings() {
+            if (!currentGuildId) return;
+
+            let settingsData = {
+                guild_id: currentGuildId,
+                tickets_enabled: document.getElementById('setting-tickets').checked,
+                moderation_enabled: document.getElementById('setting-moderation').checked,
+                roblox_enabled: document.getElementById('setting-roblox').checked,
+                apply_enabled: document.getElementById('setting-apply').checked
+            };
+
+            try {
+                let response = await fetch('http://localhost:5000/api/save-config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(settingsData)
+                });
+                
+                let result = await response.json();
+                if (result.success) {
+                    alert(currentLang === 'ar' ? '✅ تم حفظ إعدادات السيرفر وتطبيقها في البوت بنجاح!' : '✅ Settings saved and applied to bot successfully!');
+                } else {
+                    alert('❌ حدث خطأ أثناء الحفظ.');
+                }
+            } catch (error) {
+                alert('❌ تعذر الاتصال بسيرفر البوت (تأكد أن server.py يعمل).');
+            }
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'ar' ? 'en' : 'ar';
+            document.getElementById('html-root').setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+            document.getElementById('lang-text').innerText = currentLang === 'ar' ? 'English' : 'عربي';
+            document.getElementById('txt-subtitle').innerText = currentLang === 'ar' ? 'لوحة التحكم الاحترافية' : 'Pro Dashboard';
+            document.getElementById('txt-select-srv').innerText = currentLang === 'ar' ? 'اختر السيرفر لإدارة إعداداته:' : 'Select server to manage:';
+            document.getElementById('txt-save').innerText = currentLang === 'ar' ? 'حفظ التغييرات' : 'Save Changes';
+            renderServers();
+        }
+    </script>
+</body>
+</html>
